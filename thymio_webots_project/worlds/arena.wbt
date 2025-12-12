@@ -1,0 +1,73 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/CircleArena.proto"
+EXTERNPROTO "../protos/Thymio2.proto"
+IMPORTABLE EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/geometries/protos/Rectangle.proto"
+
+WorldInfo {
+  basicTimeStep 10
+  contactProperties [
+    ContactProperties {
+      material2 "thymio body"
+      coulombFriction [
+        0.7
+      ]
+    }
+  ]
+}
+Viewpoint {
+  orientation 0.11703670368390204 0.14282389064519743 -0.9828040223013819 1.3899858841238104
+  position -0.4024432606184784 2.1299374955659562 0.8548655401093492
+  follow "Thymio II"
+}
+TexturedBackgroundLight {
+}
+CircleArena {
+}
+DEF THYMIO Thymio2 {
+  translation 0 0.5 0
+  controller "webots_controller"
+}
+Solid {
+  translation 0.2 0.5 0.027
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0.501961 0.25098
+        roughness 0.4
+        metalness 0
+      }
+      geometry DEF CYLINDER1 Cylinder {
+        height 0.05
+        radius 0.04
+        subdivision 24
+      }
+    }
+  ]
+  name "obstacle"
+  model "obstacle"
+  boundingObject USE CYLINDER1
+}
+Solid {
+  translation 0.2 -0.3 0.027
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0.501961 0.25098
+        roughness 0.4
+        metalness 0
+      }
+      geometry DEF CYLINDER1 Cylinder {
+        height 0.05
+        radius 0.04
+        subdivision 24
+      }
+    }
+  ]
+  name "obstacle(1)"
+  model "obstacle"
+  boundingObject USE CYLINDER1
+}
+Solid {
+}
