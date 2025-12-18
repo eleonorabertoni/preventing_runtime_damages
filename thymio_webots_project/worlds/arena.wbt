@@ -24,6 +24,7 @@ Viewpoint {
 TexturedBackgroundLight {
 }
 CircleArena {
+  floorAppearance NULL
 }
 DEF THYMIO Thymio2 {
   translation 0 0.5 0
