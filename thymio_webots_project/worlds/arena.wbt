@@ -4,6 +4,7 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/CircleArena.proto"
 EXTERNPROTO "../protos/Thymio2.proto"
 IMPORTABLE EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/geometries/protos/Rectangle.proto"
+EXTERNPROTO "../protos/Obstacle.proto"
 
 WorldInfo {
   basicTimeStep 10
@@ -17,21 +18,25 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.11703670368390204 0.14282389064519743 -0.9828040223013819 1.3899858841238104
-  position -0.4024432606184784 2.1299374955659562 0.8548655401093492
+  orientation 0.30892251586976993 0.32610003232302365 -0.8934347475376222 1.6293220013574616
+  position -0.20696349835300878 2.136247469763022 1.786930669535949
   follow "Thymio II"
 }
 TexturedBackgroundLight {
 }
 CircleArena {
-  floorAppearance NULL
+  floorAppearance Appearance {
+    material Material {
+      diffuseColor 0 0 0
+    }
+  }
 }
 DEF THYMIO Thymio2 {
-  translation 0 0.5 0
+  translation -0.5 -0.1 0.05
   controller "webots_controller"
 }
 Solid {
-  translation 0.2 0.5 0.027
+  translation 0.321276 0.524895 0.027
   children [
     Shape {
       appearance PBRAppearance {
@@ -51,7 +56,7 @@ Solid {
   boundingObject USE CYLINDER1
 }
 Solid {
-  translation 0.2 -0.3 0.027
+  translation -0.232397 -0.332087 0.08
   children [
     Shape {
       appearance PBRAppearance {
@@ -71,4 +76,9 @@ Solid {
   boundingObject USE CYLINDER1
 }
 Solid {
+}
+Obstacle {
+  translation -0.442553 -0.0927703 0
+  color 1 1 1
+  name "obstacle(2)"
 }
