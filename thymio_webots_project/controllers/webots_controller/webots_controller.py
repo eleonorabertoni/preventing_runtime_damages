@@ -12,6 +12,16 @@ PROX_THRESHOLD = 2000
 
 GROUND_THRESHOLD = 700
 
+OVERHEATING_THRESHOLD = 1000 # ms
+
+SLOW_DOWN_TIME = 500 # ms
+
+STEP_COUNTER = [0]
+
+SLOW_DOWN_COUNTER = [0]
+
+SLOW_DOWN = [0]
+
 robot = Robot()
 
 timestep = int(robot.getBasicTimeStep())
@@ -139,15 +149,31 @@ def avoid_fast_crashes():
         if d > PROX_THRESHOLD:
             return [-pi, MAX_SPEED/2]
     return [0, 0]
-  
+
+# AVOID FULL SPEED FOR TOO LONG
+def avoid_overheating_motors():
+    if SLOW_DOWN[0]:
+        if STEP_COUNTER[0] * timestep <= SLOW_DOWN_TIME:
+            return [-pi, MAX_SPEED/3]
+        else:
+            SLOW_DOWN[0] = 0
+            STEP_COUNTER[0] = 0
+            return [0, 0]
+    elif STEP_COUNTER[0] * timestep >= OVERHEATING_THRESHOLD:
+        STEP_COUNTER[0] = 0
+        SLOW_DOWN[0] = 1
+        return [-pi, MAX_SPEED/3]  
+    else:
+        return [0, 0]
+    
 # TODO        
 #def avoid_inclinations():
 #    v = read_accelerometer(0)
 #    return [0, 0]
  
 while robot.step(timestep) != -1:
-
-  fields = [base_behaviour(), avoid_falling(), avoid_fast_crashes()]
+  STEP_COUNTER[0] = STEP_COUNTER[0] + 1
+  fields = [base_behaviour(), avoid_falling(), avoid_fast_crashes(), avoid_overheating_motors()]
   
   sum_v = [0, 0]
   for f in fields:
@@ -156,5 +182,6 @@ while robot.step(timestep) != -1:
   move = from_vector_to_differential(sum_v[0], sum_v[1])
   vl = limit_speed(move[0])
   vr = limit_speed(move[1])
-  #print(vl, vr)
+  if (vl < MAX_SPEED or vr < MAX_SPEED) and not SLOW_DOWN[0]:
+      STEP_COUNTER[0] = 0
   set_velocity(vl, vr)
