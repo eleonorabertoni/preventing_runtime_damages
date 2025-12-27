@@ -1,7 +1,7 @@
 from controller import Robot
 from controller import Accelerometer
 from controller import DistanceSensor
-#from controller import GPS
+from controller import GPS
 from math import sin, cos, sqrt, atan2, asin, pi
 
 # GLOBAL VARIABLES  
@@ -21,6 +21,10 @@ STEP_COUNTER = [0]
 SLOW_DOWN_COUNTER = [0]
 
 SLOW_DOWN = [0]
+
+LOWEST_TEMPERATURE = -40
+
+HIGHEST_TEMPERATURE = 70
 
 robot = Robot()
 
@@ -65,8 +69,8 @@ accelerometer = robot.getDevice('acc')
 accelerometer.enable(timestep)
 
 # TEMPERATURE (SIMULATED)
-#gps = robot.getDevice('gps')
-#gps.enable(timestep)
+gps = robot.getDevice('gps')
+gps.enable(timestep)
 
 # ************ PROXY METHODS ************ #
 
@@ -84,10 +88,19 @@ def read_accelerometer(index):
 def read_ground_sensor(index):
     return ground_sensors[index].getValue()
 
-# TODO    
-#def read_temperature():
-#    return gps.getValues()
-
+# simulated temperature readings    
+def read_temperature():
+    RANGE = 0.3
+    temperature = 20
+    v = gps.getValues()
+    x = v[0]
+    y = v[1]
+    if x < -RANGE and y < -RANGE:
+        temperature = LOWEST_TEMPERATURE
+    if x > RANGE and y > RANGE:
+        temperature = HIGHEST_TEMPERATURE
+    return temperature    
+    
 # ************ VECTOR LIBRARY ************ #
 def from_polar_to_cartesian(w, v):
     x = v * cos(w)
@@ -165,6 +178,13 @@ def avoid_overheating_motors():
         return [-pi, MAX_SPEED/3]  
     else:
         return [0, 0]
+        
+# AVOID EXTREME TEMPERATURE
+def avoid_extreme_temperature():
+    temperature = read_temperature()
+    if temperature <= LOWEST_TEMPERATURE or temperature >= HIGHEST_TEMPERATURE:
+        return [-pi/2, MAX_SPEED]
+    return [0, 0]
     
 # TODO        
 #def avoid_inclinations():
@@ -173,8 +193,7 @@ def avoid_overheating_motors():
  
 while robot.step(timestep) != -1:
   STEP_COUNTER[0] = STEP_COUNTER[0] + 1
-  fields = [base_behaviour(), avoid_falling(), avoid_fast_crashes(), avoid_overheating_motors()]
-  
+  fields = [base_behaviour(), avoid_falling(), avoid_fast_crashes(), avoid_overheating_motors(), avoid_extreme_temperature()]
   sum_v = [0, 0]
   for f in fields:
       sum_v = polar_sum(sum_v, f)
@@ -184,4 +203,5 @@ while robot.step(timestep) != -1:
   vr = limit_speed(move[1])
   if (vl < MAX_SPEED or vr < MAX_SPEED) and not SLOW_DOWN[0]:
       STEP_COUNTER[0] = 0
+  #print(vl, vr)
   set_velocity(vl, vr)
