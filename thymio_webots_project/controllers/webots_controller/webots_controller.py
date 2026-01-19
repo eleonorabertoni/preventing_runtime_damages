@@ -10,9 +10,13 @@ MAX_SPEED = 9.53 # rad/s
 
 PROX_THRESHOLD = 2000
 
-GROUND_THRESHOLD = 700
+GROUND_THRESHOLD = 600
 
 OVERHEATING_THRESHOLD = 1000 # ms
+
+TILT_THRESHOLD = 0.15 
+
+TILT_COUNTER = [0]
 
 SLOW_DOWN_TIME = 500 # ms
 
@@ -186,14 +190,30 @@ def avoid_extreme_temperature():
         return [-pi/2, MAX_SPEED]
     return [0, 0]
     
-# TODO        
-#def avoid_inclinations():
-#    v = read_accelerometer(0)
-#    return [0, 0]
- 
+# AVOID TILTS        
+def avoid_tilts():
+    ax = read_accelerometer(0)
+    ay = read_accelerometer(1)
+    az = read_accelerometer(2)
+    
+    v = sqrt(ax*ax + ay*ay + az*az)
+    
+    pitch = asin(ax/v)
+    roll = atan2(ay, az)
+    
+    if abs(pitch) > TILT_THRESHOLD or abs(roll) > TILT_THRESHOLD:
+        TILT_COUNTER[0] = TILT_COUNTER[0] + 1
+        if TILT_COUNTER[0] >= 5: # the counter is needed to be sure there is a tilt
+            return [-pi, MAX_SPEED]            
+    else:
+        # reset counter 
+        TILT_COUNTER[0] = 0
+    return [0, 0]
+    
 while robot.step(timestep) != -1:
+
   STEP_COUNTER[0] = STEP_COUNTER[0] + 1
-  fields = [base_behaviour(), avoid_falling(), avoid_fast_crashes(), avoid_overheating_motors(), avoid_extreme_temperature()]
+  fields = [base_behaviour(), avoid_falling(), avoid_tilts(), avoid_fast_crashes(), avoid_overheating_motors(), avoid_extreme_temperature()]
   sum_v = [0, 0]
   for f in fields:
       sum_v = polar_sum(sum_v, f)
@@ -203,5 +223,5 @@ while robot.step(timestep) != -1:
   vr = limit_speed(move[1])
   if (vl < MAX_SPEED or vr < MAX_SPEED) and not SLOW_DOWN[0]:
       STEP_COUNTER[0] = 0
-  #print(vl, vr)
+  # print(vl,vr)
   set_velocity(vl, vr)
