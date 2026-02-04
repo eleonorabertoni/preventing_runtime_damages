@@ -11,6 +11,7 @@ seed = random.random()
 def set_seed(s):
     seed = s
     random.seed(seed)
+    np.random.seed(seed)
 
 
 # Get seed used to create and update the RNN
@@ -54,17 +55,24 @@ def compute(enn, inputs):
       # Set the input and bias values in a column matrix
       ist = np.array(inputs)
       ist = np.append(inputs, [1])
+      print("ist", ist.shape)
       ist = np.reshape(ist, (-1, 1))
-      #print("ist", ist.shape)
+      print("ist", ist.shape)
 
       # Compute the value of the hidden nodes according to the inputs and bias, 
       # and then add the value of context nodes
-      hs = np.add(np.matmul(enn["l1"], ist), np.matmul(enn["lc"].T, enn["cs"]))
+      m1 = np.matmul(enn["l1"], ist)
+      #m2 = np.matmul(enn["lc"].T, enn["cs"])
+      m2 = np.matmul(enn["lc"], enn["cs"])
+      print("m1", m1.shape)
+      print("m2", m2.shape)
+      hs = np.add(m1, m2)
+      print("hs", hs.shape)
 
       # Apply the activation function on the hidden nodes
-      for i in range (1, len(hs[0])):
-           hs[0][i] = sigmoid(hs[0][i])
-
+      for i in range(len(hs[0])):
+        hs[0][i] = sigmoid(hs[0][i])
+      
       # Copy the value of the hidden nodes to the context
       enn["cs"] = hs
 
@@ -72,15 +80,15 @@ def compute(enn, inputs):
       # the hidden nodes and bias
       hs = np.append(hs, [1])
       hs = np.reshape(hs, (-1, 1))
-      #print("hl", hl.shape)
+      print("hs", hs.shape)
+      print("enn", enn["l2"].shape)
       os = np.matmul(enn["l2"], hs) 
-      #print("enn", enn["l2"].shape)
-      #print("ol", ol.shape)
+      print("os", os.shape)
 
       # Apply the activation function on the hidden nodes
-      for i in range (1, len(os[0])):
+      for i in range(len(os[0])):
            os[0][i] = sigmoid(os[0][i])
-      return enn, [ os[0][0], os[1][0] ]
+      return enn, os
 
 
 # Random change the weights of the RNN, but keep them in
@@ -91,22 +99,22 @@ def change(enn, p, perf):
       mult = math.exp(-5 * perf)
       dev = 0.75
 
-      for i in range(0, len(enn["l1"])):
-         for j in range(0, len(enn["l1"][0])):
+      for i in range(len(enn["l1"])):
+         for j in range(len(enn["l1"][0])):
              if random.random() <= p:
                  enn["l1"][i][j] = enn["l1"][i][j] + mult * random.randint(-dev * 100, dev * 100) / 100.0
                  enn["l1"][i][j] = max(-1, enn["l1"][i][j])
                  enn["l1"][i][j] = min( 1, enn["l1"][i][j])
 
-      for i in range(0, len(enn["lc"])):
-         for j in range(0, len(enn["lc"][0])):
+      for i in range(len(enn["lc"])):
+         for j in range(len(enn["lc"][0])):
              if random.random() <= p:
                  enn["lc"][i][j] = enn["lc"][i][j] + mult * random.randint(-dev * 100, dev * 100) / 100.0
                  enn["lc"][i][j] = max(-1, enn["lc"][i][j])
                  enn["lc"][i][j] = min(1, enn["lc"][i][j])
 
-      for i in range(0, len(enn["l2"])):
-         for j in range(0 , len(enn["l2"][0])):
+      for i in range(len(enn["l2"])):
+         for j in range(len(enn["l2"][0])):
              if random.random() <= p:
                  enn["l2"][i][j] = enn["l2"][i][j] + mult * random.randint(-dev * 100, dev * 100) / 100.0
                  enn["l2"][i][j] = max(-1, enn["l2"][i][j])

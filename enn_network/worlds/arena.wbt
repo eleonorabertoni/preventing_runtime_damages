@@ -1,0 +1,316 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/CircleArena.proto"
+EXTERNPROTO "../protos/Thymio2.proto"
+IMPORTABLE EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/geometries/protos/Rectangle.proto"
+
+WorldInfo {
+  basicTimeStep 10
+  contactProperties [
+    ContactProperties {
+      material2 "thymio body"
+      coulombFriction [
+        0.7
+      ]
+    }
+  ]
+}
+Viewpoint {
+  orientation 0.15483619930296416 -0.42909960316013956 -0.8898872299079382 5.512707905829152
+  position -2.241763309373175 -1.9902545244727188 1.6432945182665393
+  follow "Thymio II"
+}
+TexturedBackgroundLight {
+}
+CircleArena {
+  floorAppearance NULL
+  floorTileSize 1 1
+}
+Solid {
+  translation -0.64723 0.242642 0.027
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0.501961 0.25098
+        roughness 0.4
+        metalness 0
+      }
+      geometry DEF CYLINDER1 Cylinder {
+        height 0.05
+        radius 0.04
+        subdivision 24
+      }
+    }
+  ]
+  name "obstacle(1)"
+  model "obstacle"
+  boundingObject USE CYLINDER1
+}
+Solid {
+  translation 0.484153 0.280169 0.027
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0.501961 0.25098
+        roughness 0.4
+        metalness 0
+      }
+      geometry DEF CYLINDER1 Cylinder {
+        height 0.05
+        radius 0.04
+        subdivision 24
+      }
+    }
+  ]
+  name "obstacle(2)"
+  model "obstacle"
+  boundingObject USE CYLINDER1
+}
+Solid {
+  translation -0.00797447 -0.65929 0.027
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0.501961 0.25098
+        roughness 0.4
+        metalness 0
+      }
+      geometry DEF CYLINDER1 Cylinder {
+        height 0.05
+        radius 0.04
+        subdivision 24
+      }
+    }
+  ]
+  name "obstacle(3)"
+  model "obstacle"
+  boundingObject USE CYLINDER1
+}
+Solid {
+  translation 0.409268 -0.292803 0.027
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0.501961 0.25098
+        roughness 0.4
+        metalness 0
+      }
+      geometry DEF CYLINDER1 Cylinder {
+        height 0.05
+        radius 0.04
+        subdivision 24
+      }
+    }
+  ]
+  name "obstacle(4)"
+  model "obstacle"
+  boundingObject USE CYLINDER1
+}
+Solid {
+  translation -0.313764 -0.598609 0.027
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0.501961 0.25098
+        roughness 0.4
+        metalness 0
+      }
+      geometry DEF CYLINDER1 Cylinder {
+        height 0.05
+        radius 0.04
+        subdivision 24
+      }
+    }
+  ]
+  name "obstacle(5)"
+  model "obstacle"
+  boundingObject USE CYLINDER1
+}
+Solid {
+  translation 0.676054 -0.310443 0.027
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0.501961 0.25098
+        roughness 0.4
+        metalness 0
+      }
+      geometry DEF CYLINDER1 Cylinder {
+        height 0.05
+        radius 0.04
+        subdivision 24
+      }
+    }
+  ]
+  name "obstacle(6)"
+  model "obstacle"
+  boundingObject USE CYLINDER1
+}
+Solid {
+  translation -0.380435 0.527932 0.027
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0.501961 0.25098
+        roughness 0.4
+        metalness 0
+      }
+      geometry DEF CYLINDER1 Cylinder {
+        height 0.05
+        radius 0.04
+        subdivision 24
+      }
+    }
+  ]
+  name "obstacle(7)"
+  model "obstacle"
+  boundingObject USE CYLINDER1
+}
+Solid {
+  translation 0.422516 0.537459 0.027
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0.501961 0.25098
+        roughness 0.4
+        metalness 0
+      }
+      geometry DEF CYLINDER1 Cylinder {
+        height 0.05
+        radius 0.04
+        subdivision 24
+      }
+    }
+  ]
+  name "obstacle(8)"
+  model "obstacle"
+  boundingObject USE CYLINDER1
+}
+Solid {
+  translation -0.0983809 -0.0978897 0.027
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0.501961 0.25098
+        roughness 0.4
+        metalness 0
+      }
+      geometry DEF CYLINDER1 Cylinder {
+        height 0.05
+        radius 0.04
+        subdivision 24
+      }
+    }
+  ]
+  name "obstacle(9)"
+  model "obstacle"
+  boundingObject USE CYLINDER1
+}
+Solid {
+  translation -0.500407 -0.44282 0.027
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0.501961 0.25098
+        roughness 0.4
+        metalness 0
+      }
+      geometry DEF CYLINDER1 Cylinder {
+        height 0.05
+        radius 0.04
+        subdivision 24
+      }
+    }
+  ]
+  name "obstacle(10)"
+  model "obstacle"
+  boundingObject USE CYLINDER1
+}
+Solid {
+  translation -0.508966 -0.114502 0.027
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0.501961 0.25098
+        roughness 0.4
+        metalness 0
+      }
+      geometry DEF CYLINDER1 Cylinder {
+        height 0.05
+        radius 0.04
+        subdivision 24
+      }
+    }
+  ]
+  name "obstacle(11)"
+  model "obstacle"
+  boundingObject USE CYLINDER1
+}
+Solid {
+  translation 0.0384254 0.839121 0.027
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0.501961 0.25098
+        roughness 0.4
+        metalness 0
+      }
+      geometry DEF CYLINDER1 Cylinder {
+        height 0.05
+        radius 0.04
+        subdivision 24
+      }
+    }
+  ]
+  name "obstacle(12)"
+  model "obstacle"
+  boundingObject USE CYLINDER1
+}
+Solid {
+  translation -0.109255 -0.0174009 0.027
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0.501961 0.25098
+        roughness 0.4
+        metalness 0
+      }
+      geometry DEF CYLINDER1 Cylinder {
+        height 0.05
+        radius 0.04
+        subdivision 24
+      }
+    }
+  ]
+  name "obstacle(13)"
+  model "obstacle"
+  boundingObject USE CYLINDER1
+}
+DEF THYMIO Thymio2 {
+  translation -0.323687 -0.0590435 -5.32907e-15
+  rotation 0 0 -1 0.523591
+  controller "webots_controller"
+}
+Solid {
+  translation -0.0206041 0.503712 0.027
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0.501961 0.25098
+        roughness 0.4
+        metalness 0
+      }
+      geometry DEF CYLINDER1 Cylinder {
+        height 0.05
+        radius 0.04
+        subdivision 24
+      }
+    }
+  ]
+  name "obstacle"
+  model "obstacle"
+  boundingObject USE CYLINDER1
+}
+Solid {
+}
