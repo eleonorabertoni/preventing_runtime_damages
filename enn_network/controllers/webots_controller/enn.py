@@ -24,23 +24,19 @@ def get_seed():
 def create(incount, hidcount, outcount):
     # Initialize context units state with 1s
     cs = np.ones((hidcount, 1))
-    #print(cs.shape)
 
     # Create the weights matrix from input to hidden nodes and randomly set the weights in [-1, 1];
     # consider also the bias weights
     l1 = np.random.randint(-100, 100, (hidcount, incount + 1))
     l1 = l1 / 100
-    #print(l1.shape)
 
     # Create the weights matrix from context to hidden nodes and randomly set the weights in [-1, 1]
     lc = np.random.randint(-100, 100, (hidcount, 1))
     lc = lc / 100
-    #print(lc.shape)
 
     #-- Create the weights matrix from hidden to output nodes and set the weights to zero;
     # consider also the bias weights
     l2 = np.zeros((outcount, hidcount + 1))
-    #print(l2.shape)
 
     return { "l1" : l1, "lc" : lc, "cs" : cs, "l2" : l2 }
 
@@ -55,19 +51,11 @@ def compute(enn, inputs):
       # Set the input and bias values in a column matrix
       ist = np.array(inputs)
       ist = np.append(inputs, [1])
-      print("ist", ist.shape)
       ist = np.reshape(ist, (-1, 1))
-      print("ist", ist.shape)
 
       # Compute the value of the hidden nodes according to the inputs and bias, 
       # and then add the value of context nodes
-      m1 = np.matmul(enn["l1"], ist)
-      #m2 = np.matmul(enn["lc"].T, enn["cs"])
-      m2 = np.matmul(enn["lc"], enn["cs"])
-      print("m1", m1.shape)
-      print("m2", m2.shape)
-      hs = np.add(m1, m2)
-      print("hs", hs.shape)
+      hs = np.add(np.matmul(enn["l1"], ist), enn["lc"] * enn["cs"])
 
       # Apply the activation function on the hidden nodes
       for i in range(len(hs[0])):
@@ -80,10 +68,7 @@ def compute(enn, inputs):
       # the hidden nodes and bias
       hs = np.append(hs, [1])
       hs = np.reshape(hs, (-1, 1))
-      print("hs", hs.shape)
-      print("enn", enn["l2"].shape)
       os = np.matmul(enn["l2"], hs) 
-      print("os", os.shape)
 
       # Apply the activation function on the hidden nodes
       for i in range(len(os[0])):

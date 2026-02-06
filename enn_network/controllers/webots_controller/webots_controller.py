@@ -53,8 +53,6 @@ curr_ann = {}
 best_ann = {}
 best_prf = 0
 
-
-
 # ************ INITIALIZATION ************ #
 
 # MOTOR
@@ -71,8 +69,7 @@ prox_names = [
     'prox.horizontal.2', #fw
     'prox.horizontal.3', #right
     'prox.horizontal.4',  #right
-    'prox.horizontal.5',  #back
-    'prox.horizontal.6'  #back
+    
 ]
 for name in prox_names:
     sensor = robot.getDevice(name)
@@ -170,7 +167,6 @@ while robot.step(timestep) != -1:
     steps_count = steps_count + 1
     
     inputs = []
-    print(steps_count)
     for i in range(NUM_INPUTS):
         inputs.append(read_proximity_sensor(i))
     # Update the robot performance according to the latter step
@@ -210,9 +206,8 @@ while robot.step(timestep) != -1:
         # Start a new evaluation epoch
         evaluator.new_epoch(robot)
     # Start the first evaluation epoch
-    curr_ann, outputs = enn.compute(curr_ann, inputs) 
-    vl = limit_speed(outputs[0] * MAX_SPEED)
-    vr = limit_speed(outputs[1] * MAX_SPEED)
-    print(vl,vr)
+    curr_ann, outputs = enn.compute(curr_ann, inputs)
+    vl = limit_speed(outputs[0][0] * MAX_SPEED)
+    vr = limit_speed(outputs[1][0] * MAX_SPEED)
     set_velocity(vl, vr)
 #file_out.close()
