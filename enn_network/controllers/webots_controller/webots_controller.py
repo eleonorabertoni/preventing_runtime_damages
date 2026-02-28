@@ -39,7 +39,7 @@ timestep = int(robot.getBasicTimeStep())
 
 # Seed of the experiment for reproducibility
 SEED = 1
-MUTATION_PROBABILITY = 0.1
+MUTATION_PROBABILITY = 0.2
 
 EPOCH_STEPS = 200
 PHASE_1_EPOCHS = 720

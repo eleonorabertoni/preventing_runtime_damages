@@ -22,16 +22,16 @@ def get_seed():
 # except the output one, that will be  adapted runtime.
 # The starting context nodes value is 1.
 def create(incount, hidcount, outcount):
-    # Initialize context units state with 1s
-    cs = np.ones((hidcount, 1))
+    # Initialize context units state with 0s
+    cs = np.zeros((hidcount, 1))
 
     # Create the weights matrix from input to hidden nodes and randomly set the weights in [-1, 1];
     # consider also the bias weights
-    l1 = np.random.randint(-100, 100, (hidcount, incount + 1))
+    l1 = np.random.randint(-200, 200, (hidcount, incount + 1))
     l1 = l1 / 100
 
     # Create the weights matrix from context to hidden nodes and randomly set the weights in [-1, 1]
-    lc = np.random.randint(-100, 100, (hidcount, 1))
+    lc = np.random.randint(-200, 200, (hidcount, 1))
     lc = lc / 100
 
     #-- Create the weights matrix from hidden to output nodes and set the weights to zero;
@@ -42,8 +42,8 @@ def create(incount, hidcount, outcount):
 
 # Sigmoid function: compute the sigmoid value of an input
 # value x. Useful as ANNs activation function.
-def sigmoid(x):
-     return 1 / (1 + np.exp(-x))
+#def sigmoid(x):
+#     return 1 / (1 + np.exp(-x))
      
 # Compute the output according to the input
 def compute(enn, inputs):
@@ -58,11 +58,11 @@ def compute(enn, inputs):
       hs = np.add(np.matmul(enn["l1"], ist), enn["lc"] * enn["cs"])
 
       # Apply the activation function on the hidden nodes
-      for i in range(len(hs[0])):
-        hs[0][i] = sigmoid(hs[0][i])
+      for i in range(len(hs)):
+        hs[i][0] = math.tanh(hs[i][0])
       
       # Copy the value of the hidden nodes to the context
-      enn["cs"] = hs
+      enn["cs"] = deepcopy(hs)
 
       # Compute the value of the output nodes according to
       # the hidden nodes and bias
@@ -71,8 +71,8 @@ def compute(enn, inputs):
       os = np.matmul(enn["l2"], hs) 
 
       # Apply the activation function on the hidden nodes
-      for i in range(len(os[0])):
-           os[0][i] = sigmoid(os[0][i])
+      for i in range(len(os)):
+           os[i][0] = math.tanh(os[i][0])
       return enn, os
 
 
@@ -82,28 +82,28 @@ def change(enn, p, perf):
       # Multiplier to increase intensity of perturbation
       # with decrease of performance
       mult = math.exp(-5 * perf)
-      dev = 0.75
+      dev = 1
 
       for i in range(len(enn["l1"])):
          for j in range(len(enn["l1"][0])):
              if random.random() <= p:
                  enn["l1"][i][j] = enn["l1"][i][j] + mult * random.randint(-dev * 100, dev * 100) / 100.0
-                 enn["l1"][i][j] = max(-1, enn["l1"][i][j])
-                 enn["l1"][i][j] = min( 1, enn["l1"][i][j])
+                 enn["l1"][i][j] = max(-2, enn["l1"][i][j])
+                 enn["l1"][i][j] = min( 2, enn["l1"][i][j])
 
       for i in range(len(enn["lc"])):
          for j in range(len(enn["lc"][0])):
              if random.random() <= p:
                  enn["lc"][i][j] = enn["lc"][i][j] + mult * random.randint(-dev * 100, dev * 100) / 100.0
-                 enn["lc"][i][j] = max(-1, enn["lc"][i][j])
-                 enn["lc"][i][j] = min(1, enn["lc"][i][j])
+                 enn["lc"][i][j] = max(-2, enn["lc"][i][j])
+                 enn["lc"][i][j] = min(2, enn["lc"][i][j])
 
       for i in range(len(enn["l2"])):
          for j in range(len(enn["l2"][0])):
              if random.random() <= p:
                  enn["l2"][i][j] = enn["l2"][i][j] + mult * random.randint(-dev * 100, dev * 100) / 100.0
-                 enn["l2"][i][j] = max(-1, enn["l2"][i][j])
-                 enn["l2"][i][j] = min( 1, enn["l2"][i][j])
+                 enn["l2"][i][j] = max(-2, enn["l2"][i][j])
+                 enn["l2"][i][j] = min( 2, enn["l2"][i][j])
 
 # Copy the RNN weights
 def copy(enn):
