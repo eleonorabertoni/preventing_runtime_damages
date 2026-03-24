@@ -42,8 +42,8 @@ SEED = 1
 MUTATION_PROBABILITY = 0.2
 
 EPOCH_STEPS = 200
-PHASE_1_EPOCHS = 720
-PHASE_THRESHOLD = PHASE_1_EPOCHS * EPOCH_STEPS
+#PHASE_1_EPOCHS = 720
+#PHASE_THRESHOLD = PHASE_1_EPOCHS * EPOCH_STEPS
 
 steps_count = 0
 
@@ -68,9 +68,9 @@ prox_names = [
     'prox.horizontal.1', #left
     'prox.horizontal.2', #fw
     'prox.horizontal.3', #right
-    'prox.horizontal.4',  #right
-    
+    'prox.horizontal.4',  #right 
 ]
+
 for name in prox_names:
     sensor = robot.getDevice(name)
     sensor.enable(timestep)
@@ -146,6 +146,9 @@ steps_count = 0
 # Start the first evaluation epoch
 evaluator = Evaluator()
 evaluator.new_epoch(robot)
+vl = 0
+vr = 0
+MAX_PROX = prox_sensors[0].getMaxValue()
 #file_out = open("output.txt", "w")
 while robot.step(timestep) != -1:
     
@@ -165,18 +168,16 @@ while robot.step(timestep) != -1:
 
     # Increment the step counter
     steps_count = steps_count + 1
-    
-    inputs = []
-    for i in range(NUM_INPUTS):
-        inputs.append(read_proximity_sensor(i))
+        
     # Update the robot performance according to the latter step
-    evaluator.update(robot, inputs)
+    inputs = [read_proximity_sensor(i) / MAX_PROX for i in range(NUM_INPUTS)]
+    evaluator.update(inputs, vl, vr)
 
     # End of epoch: log results and check if current evaluation is equal to or
     # better than previous one
     if steps_count % EPOCH_STEPS == 0: 
         # Get the robot performance since the start of the epoch
-        prf = evaluator.get_performance(robot)
+        prf = evaluator.performance
 
         #file_out.write("- current-ann: \t\t")
         enn.printEnn(curr_ann)

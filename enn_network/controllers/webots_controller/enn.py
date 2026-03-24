@@ -6,9 +6,11 @@ from copy import deepcopy
 
 enn = {}
 seed = random.random()
+weight = 2
 
 # Set seed used to create and update the RNN
 def set_seed(s):
+    global seed
     seed = s
     random.seed(seed)
     np.random.seed(seed)
@@ -27,12 +29,10 @@ def create(incount, hidcount, outcount):
 
     # Create the weights matrix from input to hidden nodes and randomly set the weights in [-1, 1];
     # consider also the bias weights
-    l1 = np.random.randint(-200, 200, (hidcount, incount + 1))
-    l1 = l1 / 100
+    l1 = np.random.randint(-weight * 100, weight * 100, (hidcount, incount + 1)) / 100
 
     # Create the weights matrix from context to hidden nodes and randomly set the weights in [-1, 1]
-    lc = np.random.randint(-200, 200, (hidcount, 1))
-    lc = lc / 100
+    lc = np.random.randint(-weight * 100, weight * 100, (hidcount, 1)) / 100
 
     #-- Create the weights matrix from hidden to output nodes and set the weights to zero;
     # consider also the bias weights
@@ -88,22 +88,22 @@ def change(enn, p, perf):
          for j in range(len(enn["l1"][0])):
              if random.random() <= p:
                  enn["l1"][i][j] = enn["l1"][i][j] + mult * random.randint(-dev * 100, dev * 100) / 100.0
-                 enn["l1"][i][j] = max(-2, enn["l1"][i][j])
-                 enn["l1"][i][j] = min( 2, enn["l1"][i][j])
+                 enn["l1"][i][j] = max(-weight, enn["l1"][i][j])
+                 enn["l1"][i][j] = min( weight, enn["l1"][i][j])
 
       for i in range(len(enn["lc"])):
          for j in range(len(enn["lc"][0])):
              if random.random() <= p:
                  enn["lc"][i][j] = enn["lc"][i][j] + mult * random.randint(-dev * 100, dev * 100) / 100.0
-                 enn["lc"][i][j] = max(-2, enn["lc"][i][j])
-                 enn["lc"][i][j] = min(2, enn["lc"][i][j])
+                 enn["lc"][i][j] = max(-weight, enn["lc"][i][j])
+                 enn["lc"][i][j] = min(weight, enn["lc"][i][j])
 
       for i in range(len(enn["l2"])):
          for j in range(len(enn["l2"][0])):
              if random.random() <= p:
                  enn["l2"][i][j] = enn["l2"][i][j] + mult * random.randint(-dev * 100, dev * 100) / 100.0
-                 enn["l2"][i][j] = max(-2, enn["l2"][i][j])
-                 enn["l2"][i][j] = min( 2, enn["l2"][i][j])
+                 enn["l2"][i][j] = max(-weight, enn["l2"][i][j])
+                 enn["l2"][i][j] = min( weight, enn["l2"][i][j])
 
 # Copy the RNN weights
 def copy(enn):
