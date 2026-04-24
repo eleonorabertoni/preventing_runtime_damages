@@ -11,7 +11,7 @@ class Evaluator:
         #print(" position [x,y,z]: ", gps.getValues()) 
         self.performance = 0
 
-    # Evaluates the performance of the controller as the proximity from obstacles, direction, speed
+    # Evaluates the performance of the controller as the proximity from obstacles, direction, speed, penalize the robot when going backward
     def update(self, inputs, vleft, vright):
         MAX_SPEED = 9.53
 

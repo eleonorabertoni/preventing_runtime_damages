@@ -5,6 +5,7 @@ from controller import GPS
 from math import sin, cos, sqrt, atan2, asin, pi
 from evaluator import Evaluator
 import enn
+
 # GLOBAL VARIABLES  
 
 MAX_SPEED = 9.53 # rad/s
@@ -42,12 +43,8 @@ SEED = 1
 MUTATION_PROBABILITY = 0.2
 
 EPOCH_STEPS = 600 # ~30s: 600 * 50ms
-#PHASE_1_EPOCHS = 720
-#PHASE_THRESHOLD = PHASE_1_EPOCHS * EPOCH_STEPS
 
 steps_count = 0
-
-#season = ££ SEASON ££
 
 curr_ann = {}
 best_ann = {}
@@ -151,18 +148,10 @@ vr = 0
 MAX_PROX = prox_sensors[0].getMaxValue()
 #file_out = open("output.txt", "w")
 while robot.step(timestep) != -1:
-    
-    # Phase-logs and damage set up
 
     # Log the experiment seed and start phase one
     if steps_count == 0:
         print("seed : ", SEED)
-        print("PHASE 1")
-
-    # At half experiment switch the season
-    #if steps_count == PHASE_THRESHOLD:
-    #    print('\n# PHASE 2')
-    #    season = 1 - season
 
     # Evaluation and adaptation
 
