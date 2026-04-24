@@ -41,7 +41,7 @@ timestep = int(robot.getBasicTimeStep())
 SEED = 1
 MUTATION_PROBABILITY = 0.2
 
-EPOCH_STEPS = 200
+EPOCH_STEPS = 600 # ~30s: 600 * 50ms
 #PHASE_1_EPOCHS = 720
 #PHASE_THRESHOLD = PHASE_1_EPOCHS * EPOCH_STEPS
 
@@ -135,7 +135,7 @@ NUM_INPUTS = len(prox_sensors)
 enn.set_seed(SEED)
 
 # Create ENN with an input for each proximity sensor and 2 outputs
-curr_ann = enn.create(NUM_INPUTS, 8, 2)
+curr_ann = enn.create(NUM_INPUTS, 4, 2)
 
 # Initialize the best mapping and state of the ann
 best_ann = enn.copy(curr_ann)
@@ -171,7 +171,6 @@ while robot.step(timestep) != -1:
         
     # Update the robot performance according to the latter step
     inputs = [read_proximity_sensor(i) / MAX_PROX for i in range(NUM_INPUTS)]
-    evaluator.update(inputs, vl, vr)
 
     # End of epoch: log results and check if current evaluation is equal to or
     # better than previous one
@@ -180,7 +179,7 @@ while robot.step(timestep) != -1:
         prf = evaluator.performance
 
         #file_out.write("- current-ann: \t\t")
-        enn.printEnn(curr_ann)
+        # enn.printEnn(curr_ann)
         print('* performance: \t\t', prf)
 
         # Every odd epoch we starts a re-evaluation of the best configuration;
@@ -192,7 +191,7 @@ while robot.step(timestep) != -1:
         # Alternatively, if we found a better configuration during the 
         # exploration, set it as the new best.
         if exploratory_epoch:
-            best_prf = 0.5 * best_prf + 0.5 * prf
+            best_prf = 0.75 * best_prf + 0.25 * prf
         elif prf > best_prf:
             best_ann = enn.copy(curr_ann)
             best_prf = prf
@@ -202,13 +201,15 @@ while robot.step(timestep) != -1:
 
         # If we are starting an exploratory epoch, modify the best coupling
         if exploratory_epoch:
-             enn.change(curr_ann, MUTATION_PROBABILITY, best_prf)
+            enn.change(curr_ann, MUTATION_PROBABILITY, best_prf)
 
         # Start a new evaluation epoch
         evaluator.new_epoch(robot)
     # Start the first evaluation epoch
     curr_ann, outputs = enn.compute(curr_ann, inputs)
-    vl = limit_speed(outputs[0][0] * MAX_SPEED)
-    vr = limit_speed(outputs[1][0] * MAX_SPEED)
-    set_velocity(vl, vr)
+
+    set_velocity(*(outputs * MAX_SPEED))
+
+    evaluator.update(inputs, left_motor.getVelocity(), right_motor.getVelocity())
+
 #file_out.close()
