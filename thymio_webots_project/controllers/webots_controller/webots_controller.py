@@ -4,9 +4,11 @@ from controller import DistanceSensor
 from controller import GPS
 from math import sin, cos, sqrt, atan2, asin, pi
 
-# GLOBAL VARIABLES  
+# ************ GLOBAL VARIABLES ************ #
 
 MAX_SPEED = 9.53 # rad/s
+
+# THRESHOLDS
 
 PROX_THRESHOLD = 2000
 
@@ -14,9 +16,15 @@ GROUND_THRESHOLD = 600
 
 OVERHEATING_THRESHOLD = 1000 # ms
 
+LOWEST_TEMPERATURE = -40
+
+HIGHEST_TEMPERATURE = 70
+
 TILT_THRESHOLD = 0.15 
 
-TILT_COUNTER = [0]
+TILT_COUNTER = [0] 
+
+# COOL DOWN
 
 SLOW_DOWN_TIME = 500 # ms
 
@@ -26,15 +34,17 @@ SLOW_DOWN_COUNTER = [0]
 
 SLOW_DOWN = [0]
 
-LOWEST_TEMPERATURE = -40
+# FEEDFORWARD NEURAL NETWORK
 
-HIGHEST_TEMPERATURE = 70
+SEED = 1 # Seed of the experiment for reproducibility
+MUTATION_PROBABILITY = 0.2
 
-robot = Robot()
-
-timestep = int(robot.getBasicTimeStep())
+EPOCH_STEPS = 600 # ~30s: 600 * 50ms
 
 # ************ INITIALIZATION ************ #
+
+robot = Robot()
+timestep = int(robot.getBasicTimeStep())
 
 # MOTOR
 left_motor = robot.getDevice('motor.left')
@@ -75,6 +85,16 @@ accelerometer.enable(timestep)
 # TEMPERATURE (SIMULATED)
 gps = robot.getDevice('gps')
 gps.enable(timestep)
+
+# FEEDFORWARD NEURAL NETWORK 
+steps_count = 0
+curr_ann = {}
+best_ann = {}
+best_prf = 0
+
+# VELOCITIES
+vl = 0
+vr = 0
 
 # ************ PROXY METHODS ************ #
 
@@ -169,6 +189,10 @@ def avoid_fast_crashes():
 
 # AVOID FULL SPEED FOR TOO LONG
 def avoid_overheating_motors():
+    if (vl < MAX_SPEED or vr < MAX_SPEED) and not SLOW_DOWN[0]:
+      STEP_COUNTER[0] = 0
+    else:
+        STEP_COUNTER[0] = STEP_COUNTER[0] + 1
     if SLOW_DOWN[0]:
         if STEP_COUNTER[0] * timestep <= SLOW_DOWN_TIME:
             return [-pi, MAX_SPEED/3]
@@ -177,6 +201,7 @@ def avoid_overheating_motors():
             STEP_COUNTER[0] = 0
             return [0, 0]
     elif STEP_COUNTER[0] * timestep >= OVERHEATING_THRESHOLD:
+        print("SLOW DOWN", STEP_COUNTER[0])
         STEP_COUNTER[0] = 0
         SLOW_DOWN[0] = 1
         return [-pi, MAX_SPEED/3]  
@@ -212,8 +237,7 @@ def avoid_tilts():
     
 while robot.step(timestep) != -1:
 
-  STEP_COUNTER[0] = STEP_COUNTER[0] + 1
-  fields = [base_behaviour(), avoid_falling(), avoid_tilts(), avoid_fast_crashes(), avoid_overheating_motors(), avoid_extreme_temperature()]
+  fields = [base_behaviour(), avoid_falling(), avoid_tilts(), , avoid_overheating_motors(), avoid_extreme_temperature()]
   sum_v = [0, 0]
   for f in fields:
       sum_v = polar_sum(sum_v, f)
@@ -221,7 +245,6 @@ while robot.step(timestep) != -1:
   move = from_vector_to_differential(sum_v[0], sum_v[1])
   vl = limit_speed(move[0])
   vr = limit_speed(move[1])
-  if (vl < MAX_SPEED or vr < MAX_SPEED) and not SLOW_DOWN[0]:
-      STEP_COUNTER[0] = 0
+  
   # print(vl,vr)
   set_velocity(vl, vr)
