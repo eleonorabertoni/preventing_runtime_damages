@@ -201,7 +201,6 @@ def avoid_overheating_motors():
             STEP_COUNTER[0] = 0
             return [0, 0]
     elif STEP_COUNTER[0] * timestep >= OVERHEATING_THRESHOLD:
-        print("SLOW DOWN", STEP_COUNTER[0])
         STEP_COUNTER[0] = 0
         SLOW_DOWN[0] = 1
         return [-pi, MAX_SPEED/3]  
@@ -237,7 +236,8 @@ def avoid_tilts():
     
 while robot.step(timestep) != -1:
 
-  fields = [base_behaviour(), avoid_falling(), avoid_tilts(), , avoid_overheating_motors(), avoid_extreme_temperature()]
+  fields = [base_behaviour(), avoid_falling(), avoid_tilts(), avoid_fast_crashes(), avoid_overheating_motors(), avoid_extreme_temperature()]
+ 
   sum_v = [0, 0]
   for f in fields:
       sum_v = polar_sum(sum_v, f)
