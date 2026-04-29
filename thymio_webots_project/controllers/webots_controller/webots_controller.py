@@ -3,6 +3,8 @@ from controller import Accelerometer
 from controller import DistanceSensor
 from controller import GPS
 from math import sin, cos, sqrt, atan2, asin, pi
+from evaluator import Evaluator
+import enn
 
 # ************ GLOBAL VARIABLES ************ #
 
@@ -87,14 +89,26 @@ gps = robot.getDevice('gps')
 gps.enable(timestep)
 
 # FEEDFORWARD NEURAL NETWORK 
-steps_count = 0
-curr_ann = {}
-best_ann = {}
+NUM_INPUTS = len(prox_sensors)
+MAX_PROX = prox_sensors[0].getMaxValue()
+
+# Create NN with an input for each proximity sensor and 2 outputs
+enn.set_seed(SEED) 
+curr_ann = enn.create(NUM_INPUTS, 4, 2) 
+
+# Initialize the best mapping and state of the NN
+best_ann = enn.copy(curr_ann)
 best_prf = 0
 
+steps_count = 0
+
+# Start the first evaluation epoch
+evaluator = Evaluator()
+evaluator.new_epoch(robot)
+
 # VELOCITIES
-vl = 0
-vr = 0
+# vl = 0
+# vr = 0
 
 # ************ PROXY METHODS ************ #
 
@@ -176,7 +190,7 @@ def avoid_falling():
     right = read_ground_sensor(1)
     
     if left < GROUND_THRESHOLD or right < GROUND_THRESHOLD:
-        return [-pi, MAX_SPEED]  
+        return [-pi, MAX_SPEED]   
     return [0, 0]
     
 # AVOID FAST CRASHES
@@ -235,16 +249,75 @@ def avoid_tilts():
     return [0, 0]
     
 while robot.step(timestep) != -1:
+  
+    # Log the experiment seed and start phase one
+    if steps_count == 0:
+        print("seed : ", SEED)
 
-  fields = [base_behaviour(), avoid_falling(), avoid_tilts(), avoid_fast_crashes(), avoid_overheating_motors(), avoid_extreme_temperature()]
- 
-  sum_v = [0, 0]
-  for f in fields:
-      sum_v = polar_sum(sum_v, f)
+    # Evaluation and adaptation
+
+    # Increment the step counter
+    steps_count = steps_count + 1
+        
+    # Update the robot performance according to the latter step
+    inputs = [read_proximity_sensor(i) / MAX_PROX for i in range(NUM_INPUTS)]
+
+    # End of epoch: log results and check if current evaluation is equal to or
+    # better than previous one
+    if steps_count % EPOCH_STEPS == 0: 
+        # Get the robot performance since the start of the epoch
+        prf = evaluator.performance
+
+        #file_out.write("- current-ann: \t\t")
+        # enn.printEnn(curr_ann)
+        print('* performance: \t\t', prf)
+
+        # Every odd epoch we starts a re-evaluation of the best configuration;
+        # Every even epoch we search for better configuration
+        exploratory_epoch = (steps_count / EPOCH_STEPS) % 2 == 0
+
+        # If we are starting an exploration, it means we just re-evaluated
+        # the best configuration: update its performance;
+        # Alternatively, if we found a better configuration during the 
+        # exploration, set it as the new best.
+        if exploratory_epoch:
+            best_prf = 0.75 * best_prf + 0.25 * prf
+        elif prf > best_prf:
+            best_ann = enn.copy(curr_ann)
+            best_prf = prf
+
+        # Set the best coupling as the starting one
+        curr_ann = enn.copy(best_ann)
+
+        # If we are starting an exploratory epoch, modify the best coupling
+        if exploratory_epoch:
+            enn.change(curr_ann, MUTATION_PROBABILITY, best_prf)
+
+        # Start a new evaluation epoch
+        evaluator.new_epoch(robot)
+    # Start the first evaluation epoch
+    curr_ann, outputs = enn.compute(curr_ann, inputs)
+
+    #fields = [base_behaviour(), avoid_falling(), avoid_tilts(), avoid_fast_crashes(), avoid_overheating_motors(), avoid_extreme_temperature()]
+
+    #fields = [[*(outputs * MAX_SPEED)], avoid_falling(), avoid_tilts(), avoid_fast_crashes(), avoid_overheating_motors(), avoid_extreme_temperature()]
+    
+    # fields = [avoid_falling(), avoid_tilts(), avoid_fast_crashes(), avoid_overheating_motors(), avoid_extreme_temperature()]
+    fields = [avoid_falling()]
+    sum_v = [0, 0]
+    for f in fields:
+        sum_v = polar_sum(sum_v, f)
+    
+    if(sum_v == [0, 0]):
+        set_velocity(*(outputs * MAX_SPEED))
+    else:
+        move = from_vector_to_differential(sum_v[0], sum_v[1])
+        vl = limit_speed(move[0])
+        vr = limit_speed(move[1])
+        set_velocity(vl, vr) 
+
+    # real speed or nn output?
+    evaluator.update(inputs, left_motor.getVelocity(), right_motor.getVelocity())
+    #evaluator.update(inputs, vl, vr)
+
   
-  move = from_vector_to_differential(sum_v[0], sum_v[1])
-  vl = limit_speed(move[0])
-  vr = limit_speed(move[1])
-  
-  # print(vl,vr)
-  set_velocity(vl, vr)
