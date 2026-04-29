@@ -19,8 +19,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.15483619930296416 -0.42909960316013956 -0.8898872299079382 5.512707905829152
-  position -2.241763309373175 -1.9902545244727188 1.6432945182665393
+  orientation 0.37346202877171014 -0.5738610336576625 -0.728841290758885 4.825411612104645
+  position -0.4533624201976927 -1.1514892886739427 2.8468802841557017
   follow "Thymio II"
 }
 TexturedBackgroundLight {
@@ -33,7 +33,7 @@ CircleArena {
   }
 }
 DEF THYMIO Thymio2 {
-  translation -0.816719 -0.217475 0
+  translation 0.430314 -0.0409938 0.05
   rotation 0 0 -1 0.523591
   controller "webots_controller"
 }
@@ -58,7 +58,27 @@ Solid {
   boundingObject USE CYLINDER1
 }
 Solid {
-  translation 0.254929 0.186519 0.08
+  translation -0.512234 -0.0719206 0.027
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0.501961 0.25098
+        roughness 0.4
+        metalness 0
+      }
+      geometry DEF CYLINDER1 Cylinder {
+        height 0.05
+        radius 0.04
+        subdivision 24
+      }
+    }
+  ]
+  name "obstacle(3)"
+  model "obstacle"
+  boundingObject USE CYLINDER1
+}
+Solid {
+  translation 0.0462502 0.126786 0.08
   children [
     Shape {
       appearance PBRAppearance {
@@ -80,10 +100,11 @@ Solid {
 Solid {
 }
 Obstacle {
-  translation 0.15934 0.44681 -4.64073e-14
+  translation 0.112311 0.131532 -4.01901e-14
   color 1 1 1
   name "obstacle(2)"
 }
 Ramp30deg {
-  translation 0.144312 -0.378915 -0.41
+  translation -0.567678 -0.481534 -0.41
+  rotation 0 0 1 1.0472
 }
