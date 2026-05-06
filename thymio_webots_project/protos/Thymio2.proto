@@ -313,15 +313,27 @@ PROTO Thymio2 [
         name "prox.horizontal.6"
       }
       Thymio2DistanceSensor {
-        translation 0.07355 0.012 0.008
+        translation 0.05 0.05 0.006
         rotation -0.536795 -0.650923 0.536796 -1.987546
         name "prox.ground.0"
         isGroundSensor TRUE
       }
       Thymio2DistanceSensor {
-        translation 0.07355 -0.012 0.008
+        translation 0.05 -0.05 0.006
         rotation -0.55533 0.619047 0.555329 2.032979
         name "prox.ground.1"
+        isGroundSensor TRUE
+      }
+      Thymio2DistanceSensor {
+        translation -0.05 0.05 0.006
+        rotation -0.536795 -0.650923 0.536796 -1.987546
+        name "prox.ground.2"
+        isGroundSensor TRUE
+      }
+      Thymio2DistanceSensor {
+        translation -0.05 -0.05 0.006
+        rotation -0.55533 0.619047 0.555329 2.032979
+        name "prox.ground.3"
         isGroundSensor TRUE
       }
       Thymio2LED {

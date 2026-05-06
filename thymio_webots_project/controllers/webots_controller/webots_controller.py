@@ -38,7 +38,7 @@ SLOW_DOWN = [0]
 
 # FEEDFORWARD NEURAL NETWORK
 
-SEED = 1 # Seed of the experiment for reproducibility
+SEED = 4 # Seed of the experiment for reproducibility
 MUTATION_PROBABILITY = 0.2
 
 EPOCH_STEPS = 600 # ~30s: 600 * 50ms
@@ -58,7 +58,9 @@ right_motor.setPosition(float('inf'))
 ground_sensors = []
 ground_names = [
         'prox.ground.0', #left
-        'prox.ground.1' #right
+        'prox.ground.1', #right
+        'prox.ground.2', #back
+        'prox.ground.3' #back
 ]
 
 for name in ground_names:
@@ -105,10 +107,6 @@ steps_count = 0
 # Start the first evaluation epoch
 evaluator = Evaluator()
 evaluator.new_epoch(robot)
-
-# VELOCITIES
-# vl = 0
-# vr = 0
 
 # ************ PROXY METHODS ************ #
 
@@ -188,9 +186,13 @@ def base_behaviour():
 def avoid_falling():
     left = read_ground_sensor(0)
     right = read_ground_sensor(1)
+    b1 = read_ground_sensor(2)
+    b2 = read_ground_sensor(3)
     
     if left < GROUND_THRESHOLD or right < GROUND_THRESHOLD:
-        return [-pi, MAX_SPEED]   
+        return [-pi, MAX_SPEED] 
+    if b1 < GROUND_THRESHOLD or b2 < GROUND_THRESHOLD:
+        return [0, MAX_SPEED] 
     return [0, 0]
     
 # AVOID FAST CRASHES
@@ -297,27 +299,22 @@ while robot.step(timestep) != -1:
         evaluator.new_epoch(robot)
     # Start the first evaluation epoch
     curr_ann, outputs = enn.compute(curr_ann, inputs)
-
-    #fields = [base_behaviour(), avoid_falling(), avoid_tilts(), avoid_fast_crashes(), avoid_overheating_motors(), avoid_extreme_temperature()]
-
-    #fields = [[*(outputs * MAX_SPEED)], avoid_falling(), avoid_tilts(), avoid_fast_crashes(), avoid_overheating_motors(), avoid_extreme_temperature()]
     
     # fields = [avoid_falling(), avoid_tilts(), avoid_fast_crashes(), avoid_overheating_motors(), avoid_extreme_temperature()]
-    fields = [avoid_falling()]
+    fields = [(outputs[0] * pi, max(outputs[1],0) * MAX_SPEED), avoid_falling()]
+    #print("rete", fields[0])
+    #print("falling",fields[1])
     sum_v = [0, 0]
     for f in fields:
         sum_v = polar_sum(sum_v, f)
+    #print("sum", sum_v)
     
-    if(sum_v == [0, 0]):
-        set_velocity(*(outputs * MAX_SPEED))
-    else:
-        move = from_vector_to_differential(sum_v[0], sum_v[1])
-        vl = limit_speed(move[0])
-        vr = limit_speed(move[1])
-        set_velocity(vl, vr) 
+    move = from_vector_to_differential(sum_v[0], sum_v[1])
+    #print("move", move)
+    vl = limit_speed(move[0])
+    vr = limit_speed(move[1])
+    set_velocity(vl, vr) 
 
-    # real speed or nn output?
     evaluator.update(inputs, left_motor.getVelocity(), right_motor.getVelocity())
-    #evaluator.update(inputs, vl, vr)
 
   
