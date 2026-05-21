@@ -38,7 +38,7 @@ SLOW_DOWN = [0]
 
 # FEEDFORWARD NEURAL NETWORK
 
-SEED = 4 # Seed of the experiment for reproducibility
+SEED = 1 # Seed of the experiment for reproducibility
 MUTATION_PROBABILITY = 0.2
 
 EPOCH_STEPS = 600 # ~30s: 600 * 50ms
@@ -107,6 +107,9 @@ steps_count = 0
 # Start the first evaluation epoch
 evaluator = Evaluator()
 evaluator.new_epoch(robot)
+
+vl = 0
+vr = 0
 
 # ************ PROXY METHODS ************ #
 
