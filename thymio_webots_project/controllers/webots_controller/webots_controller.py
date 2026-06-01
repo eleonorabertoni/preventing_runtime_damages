@@ -38,7 +38,7 @@ SLOW_DOWN = [0]
 
 # FEEDFORWARD NEURAL NETWORK
 
-SEED = 1 # Seed of the experiment for reproducibility
+SEED = 4 # Seed of the experiment for reproducibility
 MUTATION_PROBABILITY = 0.2
 
 EPOCH_STEPS = 600 # ~30s: 600 * 50ms
@@ -75,7 +75,9 @@ prox_names = [
     'prox.horizontal.1', #left
     'prox.horizontal.2', #fw
     'prox.horizontal.3', #right
-    'prox.horizontal.4'  #right
+    'prox.horizontal.4',  #right
+    'prox.horizontal.5', #back
+    'prox.horizontal.6'  #back
 ]
 for name in prox_names:
     sensor = robot.getDevice(name)
@@ -129,15 +131,17 @@ def read_ground_sensor(index):
 
 # simulated temperature readings    
 def read_temperature():
-    RANGE = 0.3
+    #RANGE = 0.3
     temperature = 20
     v = gps.getValues()
     x = v[0]
     y = v[1]
-    if x < -RANGE and y < -RANGE:
-        temperature = LOWEST_TEMPERATURE
-    if x > RANGE and y > RANGE:
-        temperature = HIGHEST_TEMPERATURE
+    #if x < -RANGE and y < -RANGE:
+    #    temperature = LOWEST_TEMPERATURE
+    #if x > RANGE and y > RANGE:
+    #    temperature = HIGHEST_TEMPERATURE
+    if x > 0 and y < 0:
+        return HIGHEST_TEMPERATURE#temperature = HIGHEST_TEMPERATURE * (x+y)/2
     return temperature    
     
 # ************ VECTOR LIBRARY ************ #
@@ -200,10 +204,13 @@ def avoid_falling():
     
 # AVOID FAST CRASHES
 def avoid_fast_crashes():
-    for i in range(5):
+    for i in range(NUM_INPUTS):
         d = read_proximity_sensor(i)
         if d > PROX_THRESHOLD:
-            return [-pi, MAX_SPEED/2]
+            if i >= 5:
+                return [0, MAX_SPEED/2]
+            else:
+                return [-pi, MAX_SPEED/2]
     return [0, 0]
 
 # AVOID FULL SPEED FOR TOO LONG
@@ -229,9 +236,9 @@ def avoid_overheating_motors():
 # AVOID EXTREME TEMPERATURE
 def avoid_extreme_temperature():
     temperature = read_temperature()
-    if temperature <= LOWEST_TEMPERATURE or temperature >= HIGHEST_TEMPERATURE:
-        return [-pi/2, MAX_SPEED]
-    return [0, 0]
+    if abs(temperature) >= HIGHEST_TEMPERATURE:
+        return [-pi, MAX_SPEED]
+    return [0,0]
     
 # AVOID TILTS        
 def avoid_tilts():
@@ -243,8 +250,7 @@ def avoid_tilts():
     
     pitch = asin(ax/v)
     roll = atan2(ay, az)
-    
-    if abs(pitch) > TILT_THRESHOLD or abs(roll) > TILT_THRESHOLD:
+    if abs(pitch) >= TILT_THRESHOLD or abs(roll) >= TILT_THRESHOLD:
         TILT_COUNTER[0] = TILT_COUNTER[0] + 1
         if TILT_COUNTER[0] >= 5: # the counter is needed to be sure there is a tilt
             return [-pi, MAX_SPEED]            
